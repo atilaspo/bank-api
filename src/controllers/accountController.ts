@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import { body, param } from "express-validator";
 import { validateRequest } from "../middlewares/validationMiddleware";
+import { sanitizeInput } from "../utils/sanitization";
 import { 
     getAllAccounts, 
     createNewAccount, 
@@ -20,18 +21,32 @@ export const getAccounts: RequestHandler = (req, res): void => {
  * Validation rules for account creation.
  */
 export const createAccountValidations = [
-    body("owner").isString().notEmpty().withMessage("The owner's name is required"),
+    body("owner")
+        .isString()
+        .notEmpty().withMessage("The owner's name is required")
+        .matches(/^[a-zA-Z\s]+$/).withMessage("Owner name contains invalid characters") // 🔥 Evita caracteres peligrosos
+        .escape(),
     validateRequest
 ];
 
 /**
  * Handles account creation.
  */
-export const createAccountHandler: RequestHandler = (req, res) => {
+export const createAccountHandler: RequestHandler = (req, res): void => {
     const { owner } = req.body;
-    const newAccount = createNewAccount(owner);
+
+    // Sanitize input
+    const sanitizedOwner = sanitizeInput(owner);
+
+    if (!sanitizedOwner) {
+        res.status(400).json({ success: false, error: "Invalid account owner name" });
+        return;
+    }
+
+    const newAccount = createNewAccount(sanitizedOwner);
     res.status(201).json({ success: true, data: newAccount });
 };
+
 
 /**
  * Validation rules for deposits.
