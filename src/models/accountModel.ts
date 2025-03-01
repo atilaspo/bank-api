@@ -1,5 +1,5 @@
-export interface Account {
-    id: number;
+export type Account = {
+    readonly id: number;
     owner: string;
     balance: number;
   };
