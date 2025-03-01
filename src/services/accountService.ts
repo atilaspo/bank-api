@@ -28,7 +28,7 @@ export const createNewAccount = (owner: string): Account => {
 export const depositToAccount = (accountId: number, amount: number): Account | string => {
     const account = accounts.find(acc => acc.id === accountId);
     if (!account) return "Account not found";
-    if (amount <= 0) return "Invalid amount";
+    if (amount <= 0) return "Amount must be greater than zero";
 
     account.balance += amount;
     return account;
@@ -43,7 +43,8 @@ export const depositToAccount = (accountId: number, amount: number): Account | s
 export const withdrawFromAccount = (accountId: number, amount: number): Account | string => {
     const account = accounts.find(acc => acc.id === accountId);
     if (!account) return "Account not found";
-    if (amount <= 0 || amount > account.balance) return "Invalid or insufficient amount";
+    if (amount <= 0) return "Amount must be greater than zero";
+    if (amount > account.balance) return "Insufficient balance";
 
     account.balance -= amount;
     return account;
@@ -61,7 +62,8 @@ export const transferBetweenAccounts = (fromId: number, toId: number, amount: nu
     const toAccount = accounts.find(acc => acc.id === toId);
 
     if (!fromAccount || !toAccount) return "One or both accounts do not exist";
-    if (amount <= 0 || amount > fromAccount.balance) return "Invalid or insufficient amount";
+    if (amount <= 0) return "Amount must be greater than zero";
+    if (amount > fromAccount.balance) return "Insufficient balance";
 
     fromAccount.balance -= amount;
     toAccount.balance += amount;
