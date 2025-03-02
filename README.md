@@ -20,7 +20,7 @@ A simple **Banking System API** built with **TypeScript and Express**, allowing 
 - ✅ **Express.js**
 - ✅ **Angula** (for Frontend) // TO DO 🚧
 - ✅ **Jest** (for testing) // TO DO 🚧
-- ✅ **MongoDB** (for data persistence) // TO DO 🚧
+- ✅ **Postgres** (for data persistence)
 - ✅ **Docker** (for containerization) // TO DO 🚧
 
 ## 🛠 Installation
