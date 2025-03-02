@@ -19,7 +19,7 @@ A simple **Banking System API** built with **TypeScript and Express**, allowing 
 - ✅ **Node.js**
 - ✅ **Express.js**
 - ✅ **Jest** (for testing) // TO DO 🚧
-- ✅ **Postgres** (for data persistence) // TO DO 🚧
+- ✅ **Postgres** (for data persistence)
 - ✅ **Docker** (for containerization) // TO DO 🚧
 
 ## 🛠 Installation

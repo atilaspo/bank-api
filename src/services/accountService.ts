@@ -1,72 +1,65 @@
-import { Account, accounts } from "../models/accountModel";
+import { Account } from "../models/accountModel";
+import { findAllAccounts, findAccountById, createAccount, updateAccount } from "../repositories/accountRepository";
 
 /**
  * Retrieves all accounts.
- * @returns List of accounts
  */
-export const getAllAccounts = (): Account[] => {
-    return accounts;
+export const getAllAccounts = async (): Promise<Account[]> => {
+    return await findAllAccounts();
 };
 
 /**
- * Creates a new account with an initial balance of 0.
- * @param owner - The account owner's name
- * @returns The created account
+ * Creates a new account.
  */
-export const createNewAccount = (owner: string): Account => {
-    const newAccount: Account = { id: accounts.length + 1, owner, balance: 0 };
-    accounts.push(newAccount);
-    return newAccount;
+export const createNewAccount = async (owner: string): Promise<Account> => {
+    return await createAccount(owner);
 };
 
 /**
- * Deposits an amount into an account.
- * @param accountId - The target account ID
- * @param amount - The amount to deposit
- * @returns The updated account or an error message
+ * Deposits money into an account.
  */
-export const depositToAccount = (accountId: number, amount: number): Account | string => {
-    const account = accounts.find(acc => acc.id === accountId);
+export const depositToAccount = async (accountId: number, amount: number): Promise<Account | string> => {
+    const account = await findAccountById(accountId);
     if (!account) return "Account not found";
     if (amount <= 0) return "Amount must be greater than zero";
 
     account.balance += amount;
+    await updateAccount(account);
     return account;
 };
 
 /**
- * Withdraws an amount from an account.
- * @param accountId - The account ID
- * @param amount - The amount to withdraw
- * @returns The updated account or an error message
+ * Withdraws money from an account.
  */
-export const withdrawFromAccount = (accountId: number, amount: number): Account | string => {
-    const account = accounts.find(acc => acc.id === accountId);
+export const withdrawFromAccount = async (accountId: number, amount: number): Promise<Account | string> => {
+    const account = await findAccountById(accountId);
     if (!account) return "Account not found";
-    if (amount <= 0) return "Amount must be greater than zero";
-    if (amount > account.balance) return "Insufficient balance";
+    if (amount <= 0 || amount > account.balance) return "Invalid or insufficient amount";
 
     account.balance -= amount;
+    await updateAccount(account);
     return account;
 };
 
 /**
  * Transfers money between two accounts.
- * @param fromId - The sender's account ID
- * @param toId - The recipient's account ID
- * @param amount - The amount to transfer
- * @returns The updated accounts or an error message
  */
-export const transferBetweenAccounts = (fromId: number, toId: number, amount: number): { fromAccount: Account, toAccount: Account } | string => {
-    const fromAccount = accounts.find(acc => acc.id === fromId);
-    const toAccount = accounts.find(acc => acc.id === toId);
+export const transferBetweenAccounts = async (
+    fromId: number,
+    toId: number,
+    amount: number
+): Promise<{ fromAccount: Account; toAccount: Account } | string> => {
+    const fromAccount = await findAccountById(fromId);
+    const toAccount = await findAccountById(toId);
 
     if (!fromAccount || !toAccount) return "One or both accounts do not exist";
-    if (amount <= 0) return "Amount must be greater than zero";
-    if (amount > fromAccount.balance) return "Insufficient balance";
+    if (amount <= 0 || amount > fromAccount.balance) return "Invalid or insufficient amount";
 
     fromAccount.balance -= amount;
     toAccount.balance += amount;
+
+    await updateAccount(fromAccount);
+    await updateAccount(toAccount);
 
     return { fromAccount, toAccount };
 };
