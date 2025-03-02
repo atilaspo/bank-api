@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import { sequelize } from "./config/database";
 import accountRoutes from "./routes/accountRoutes";
+import userRoutes from "./routes/userRoutes";
+import "./models/associations";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,7 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api", accountRoutes);
+app.use("/api/accounts", accountRoutes);
+app.use("/api/users", userRoutes);
 
 /**
  * Function to start the server after checking the database connection.

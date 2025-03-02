@@ -1,24 +1,29 @@
-import { Account } from "../models/accountModel";
-import { findAllAccounts, findAccountById, createAccount, updateAccount } from "../repositories/accountRepository";
+import  { AccountModel }  from "../models/accountModel";
+import { 
+    findAllAccounts, 
+    findAccountById, 
+    createAccount, 
+    updateAccount 
+} from "../repositories/accountRepository";
 
 /**
  * Retrieves all accounts.
  */
-export const getAllAccounts = async (): Promise<Account[]> => {
+export const getAllAccounts = async (): Promise<AccountModel[]> => {
     return await findAllAccounts();
 };
 
 /**
  * Creates a new account.
  */
-export const createNewAccount = async (owner: string): Promise<Account> => {
-    return await createAccount(owner);
+export const createNewAccount = async (ownerId: number): Promise<AccountModel> => {
+    return await createAccount(ownerId);
 };
 
 /**
  * Deposits money into an account.
  */
-export const depositToAccount = async (accountId: number, amount: number): Promise<Account | string> => {
+export const depositToAccount = async (accountId: number, amount: number): Promise<AccountModel | string> => {
     const account = await findAccountById(accountId);
     if (!account) return "Account not found";
     if (amount <= 0) return "Amount must be greater than zero";
@@ -31,7 +36,7 @@ export const depositToAccount = async (accountId: number, amount: number): Promi
 /**
  * Withdraws money from an account.
  */
-export const withdrawFromAccount = async (accountId: number, amount: number): Promise<Account | string> => {
+export const withdrawFromAccount = async (accountId: number, amount: number): Promise<AccountModel | string> => {
     const account = await findAccountById(accountId);
     if (!account) return "Account not found";
     if (amount <= 0 || amount > account.balance) return "Invalid or insufficient amount";
@@ -48,7 +53,7 @@ export const transferBetweenAccounts = async (
     fromId: number,
     toId: number,
     amount: number
-): Promise<{ fromAccount: Account; toAccount: Account } | string> => {
+): Promise<{ fromAccount: AccountModel; toAccount: AccountModel } | string> => {
     const fromAccount = await findAccountById(fromId);
     const toAccount = await findAccountById(toId);
 

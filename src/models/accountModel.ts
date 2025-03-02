@@ -1,23 +1,28 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database";
+import { UserModel } from "./userModel";
 
-export class Account extends Model {
+class AccountModel extends Model {
     public id!: number;
-    public owner!: string;
+    public ownerId!: number;
     public balance!: number;
 }
 
-// Define the schema
-Account.init(
+AccountModel.init(
     {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
-        owner: {
-            type: DataTypes.STRING,
+        ownerId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
+            references: {
+                model: UserModel,
+                key: "id",
+            },
+            onDelete: "CASCADE",
         },
         balance: {
             type: DataTypes.FLOAT,
@@ -30,3 +35,5 @@ Account.init(
         tableName: "accounts",
     }
 );
+
+export { AccountModel };

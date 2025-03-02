@@ -27,11 +27,9 @@ export const getAccounts: RequestHandler = async (req, res) => {
  * Validation rules for account creation.
  */
 export const createAccountValidations = [
-    body("owner")
-        .isString()
-        .notEmpty().withMessage("The owner's name is required")
-        .matches(/^[a-zA-Z\s]+$/).withMessage("Owner name contains invalid characters")
-        .escape(),
+    body("ownerId")
+        .isInt({ min: 1 })
+        .withMessage("Owner ID must be a valid integer"),
     validateRequest
 ];
 
@@ -40,16 +38,15 @@ export const createAccountValidations = [
  */
 export const createAccountHandler: RequestHandler = async (req, res) => {
     try {
-        const { owner } = req.body;
+        const { ownerId } = req.body;
 
-        // Sanitize input
-        const sanitizedOwner = sanitizeInput(owner);
-        if (!sanitizedOwner) {
-            res.status(400).json({ success: false, error: "Invalid account owner name" });
+        // Validate and sanitize input
+        if (!ownerId || typeof ownerId !== "number") {
+            res.status(400).json({ success: false, error: "Invalid owner ID" });
             return
         }
 
-        const newAccount = await createNewAccount(sanitizedOwner);
+        const newAccount = await createNewAccount(ownerId);
         res.status(201).json({ success: true, data: newAccount });
     } catch (error) {
         console.error(error);
@@ -139,7 +136,7 @@ export const transferHandler: RequestHandler = async (req, res) => {
         const result = await transferBetweenAccounts(fromId, toId, amount);
         if (typeof result === "string") {
             res.status(400).json({ success: false, error: result });
-            return 
+            return
         }
 
         res.json({ success: true, data: result });
