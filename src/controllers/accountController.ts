@@ -13,8 +13,14 @@ import {
 /**
  * Handles retrieving all accounts.
  */
-export const getAccounts: RequestHandler = (req, res): void => {
-    res.json({ success: true, data: getAllAccounts() });
+export const getAccounts: RequestHandler = async (req, res) => {
+    try {
+        const accounts = await getAllAccounts();
+        res.json({ success: true, data: accounts });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
 };
 
 /**
@@ -24,7 +30,7 @@ export const createAccountValidations = [
     body("owner")
         .isString()
         .notEmpty().withMessage("The owner's name is required")
-        .matches(/^[a-zA-Z\s]+$/).withMessage("Owner name contains invalid characters") // 🔥 Evita caracteres peligrosos
+        .matches(/^[a-zA-Z\s]+$/).withMessage("Owner name contains invalid characters")
         .escape(),
     validateRequest
 ];
@@ -32,21 +38,24 @@ export const createAccountValidations = [
 /**
  * Handles account creation.
  */
-export const createAccountHandler: RequestHandler = (req, res): void => {
-    const { owner } = req.body;
+export const createAccountHandler: RequestHandler = async (req, res) => {
+    try {
+        const { owner } = req.body;
 
-    // Sanitize input
-    const sanitizedOwner = sanitizeInput(owner);
+        // Sanitize input
+        const sanitizedOwner = sanitizeInput(owner);
+        if (!sanitizedOwner) {
+            res.status(400).json({ success: false, error: "Invalid account owner name" });
+            return
+        }
 
-    if (!sanitizedOwner) {
-        res.status(400).json({ success: false, error: "Invalid account owner name" });
-        return;
+        const newAccount = await createNewAccount(sanitizedOwner);
+        res.status(201).json({ success: true, data: newAccount });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
-
-    const newAccount = createNewAccount(sanitizedOwner);
-    res.status(201).json({ success: true, data: newAccount });
 };
-
 
 /**
  * Validation rules for deposits.
@@ -60,17 +69,22 @@ export const depositValidations = [
 /**
  * Handles deposits to an account.
  */
-export const depositHandler: RequestHandler = (req, res) => {
-    const accountId = parseInt(req.params.id, 10);
-    const { amount } = req.body;
+export const depositHandler: RequestHandler = async (req, res) => {
+    try {
+        const accountId = parseInt(req.params.id, 10);
+        const { amount } = req.body;
 
-    const result = depositToAccount(accountId, amount);
-    if (typeof result === "string") {
-        res.status(400).json({ success: false, error: result });
-        return;
+        const result = await depositToAccount(accountId, amount);
+        if (typeof result === "string") {
+            res.status(400).json({ success: false, error: result });
+            return
+        }
+
+        res.json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
-
-    res.json({ success: true, data: result });
 };
 
 /**
@@ -85,17 +99,22 @@ export const withdrawValidations = [
 /**
  * Handles withdrawals from an account.
  */
-export const withdrawHandler: RequestHandler = (req, res) => {
-    const accountId = parseInt(req.params.id, 10);
-    const { amount } = req.body;
+export const withdrawHandler: RequestHandler = async (req, res) => {
+    try {
+        const accountId = parseInt(req.params.id, 10);
+        const { amount } = req.body;
 
-    const result = withdrawFromAccount(accountId, amount);
-    if (typeof result === "string") {
-        res.status(400).json({ success: false, error: result });
-        return;
+        const result = await withdrawFromAccount(accountId, amount);
+        if (typeof result === "string") {
+            res.status(400).json({ success: false, error: result });
+            return
+        }
+
+        res.json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
-
-    res.json({ success: true, data: result });
 };
 
 /**
@@ -111,16 +130,21 @@ export const transferValidations = [
 /**
  * Handles transfers between two accounts.
  */
-export const transferHandler: RequestHandler = (req, res) => {
-    const fromId = parseInt(req.params.fromId, 10);
-    const toId = parseInt(req.params.toId, 10);
-    const { amount } = req.body;
+export const transferHandler: RequestHandler = async (req, res) => {
+    try {
+        const fromId = parseInt(req.params.fromId, 10);
+        const toId = parseInt(req.params.toId, 10);
+        const { amount } = req.body;
 
-    const result = transferBetweenAccounts(fromId, toId, amount);
-    if (typeof result === "string") {
-        res.status(400).json({ success: false, error: result });
-        return;
+        const result = await transferBetweenAccounts(fromId, toId, amount);
+        if (typeof result === "string") {
+            res.status(400).json({ success: false, error: result });
+            return 
+        }
+
+        res.json({ success: true, data: result });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
-
-    res.json({ success: true, data: result });
 };
