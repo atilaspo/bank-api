@@ -3,6 +3,7 @@ import cors from "cors";
 import { sequelize } from "./config/database";
 import accountRoutes from "./routes/accountRoutes";
 import userRoutes from "./routes/userRoutes";
+import transactionRoutes from "./routes/transactionRoutes";
 import "./models/associations";
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 // Routes
 app.use("/api/accounts", accountRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/transactions", transactionRoutes);
 
 /**
  * Function to start the server after checking the database connection.
