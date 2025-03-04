@@ -5,6 +5,7 @@ import {
     createAccount, 
     updateAccount 
 } from "../repositories/accountRepository";
+import { createTransaction } from "../repositories/transactionRepository";
 
 /**
  * Retrieves all accounts.
@@ -30,6 +31,8 @@ export const depositToAccount = async (accountId: number, amount: number): Promi
 
     account.balance += amount;
     await updateAccount(account);
+
+    await createTransaction(accountId, "deposit", amount);
     return account;
 };
 
@@ -43,6 +46,9 @@ export const withdrawFromAccount = async (accountId: number, amount: number): Pr
 
     account.balance -= amount;
     await updateAccount(account);
+
+    await createTransaction(accountId, "withdrawal", amount);
+
     return account;
 };
 
@@ -65,6 +71,9 @@ export const transferBetweenAccounts = async (
 
     await updateAccount(fromAccount);
     await updateAccount(toAccount);
+
+    await createTransaction(fromId, "transfer", -amount);
+    await createTransaction(toId, "transfer", amount);
 
     return { fromAccount, toAccount };
 };

@@ -13,7 +13,6 @@ import {
 
 const router: Router = express.Router();
 
-// 🚀 No es necesario repetir "/accounts", ya que ya se define en index.ts
 router.get("/", getAccounts);
 router.post("/", createAccountValidations as RequestHandler[], createAccountHandler);
 router.put("/:id/deposit", depositValidations as RequestHandler[], depositHandler);
