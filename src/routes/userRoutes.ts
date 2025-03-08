@@ -3,7 +3,6 @@ import { registerUserHandler, userRegistrationValidations, getUserHandler, getUs
 
 const router = express.Router();
 
-router.post("/", userRegistrationValidations as RequestHandler[], registerUserHandler);
 router.get("/:id", getUserValidations as RequestHandler[], getUserHandler);
 
 export default router;
