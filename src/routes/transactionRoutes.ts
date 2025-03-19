@@ -1,9 +1,9 @@
 import express, { RequestHandler } from "express";
 import { getTransactionsHandler, getTransactionsValidations } from "../controllers/transactionController";
+import { authenticateJWT } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-// Get all transactions for an account
-router.get("/:accountId/transactions", getTransactionsValidations as RequestHandler[], getTransactionsHandler);
+router.get("/:accountId/transactions", authenticateJWT, getTransactionsValidations as RequestHandler[], getTransactionsHandler);
 
 export default router;
